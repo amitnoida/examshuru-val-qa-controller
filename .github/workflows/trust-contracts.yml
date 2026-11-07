@@ -25,3 +25,20 @@ jobs:
           persist-credentials: false
       - name: Check denial conditions without accessing secrets
         run: bash scripts/test-trust-contracts.sh
+  hosted-protected-main-attestation:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require actual GitHub-enforced protected main (no secrets)
+        env:
+          REF_PROTECTED: ${{ github.ref_protected }}
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR_ID: ${{ github.actor_id }}
+        run: |
+          set -euo pipefail
+          if [ "$REF_PROTECTED" != true ] || [ "$GITHUB_REPOSITORY" != amitnoida/examshuru-val-qa-controller ] || [ "$GITHUB_REF" != refs/heads/main ] || [ "$EVENT_NAME" != push ]; then
+            echo "::error::controller main protection not attested"
+            exit 1
+          fi
+          echo "HOSTED PROTECTED MAIN PASS — credentials not loaded"
