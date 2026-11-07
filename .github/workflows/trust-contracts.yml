@@ -1,0 +1,27 @@
+name: QA Controller Trust Contracts (no credentials)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/trust-contracts.yml'
+      - 'scripts/require-trusted-controller.sh'
+      - 'scripts/test-trust-contracts.sh'
+      - 'SECURITY.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/trust-contracts.yml'
+      - 'scripts/require-trusted-controller.sh'
+      - 'scripts/test-trust-contracts.sh'
+      - 'SECURITY.md'
+permissions:
+  contents: read
+jobs:
+  negative-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Check denial conditions without accessing secrets
+        run: bash scripts/test-trust-contracts.sh
